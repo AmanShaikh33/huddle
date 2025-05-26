@@ -78,7 +78,7 @@ export const UserContextProvider = ({ children }) => {
 
   async function followUser(id, fetchUser) {
     try {
-      const { data } = await axios.post("/api/user/follow/" + id);
+      const { data } = await axios.post(`/api/user/follow/${id}`);
 
       toast.success(data.message);
       fetchUser();
@@ -88,26 +88,37 @@ export const UserContextProvider = ({ children }) => {
   }
 
   async function updateProfilePic(id, formdata, setFile) {
+    if (!id) {
+      toast.error("User ID is missing");
+      return;
+    }
+  
     try {
       const { data } = await axios.put("/api/user/" + id, formdata);
       toast.success(data.message);
       fetchUser();
-      setFile(null);
+      setFile(null); // Clear the file input
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   }
+  
   async function updateProfileName(id, name, setShowInput) {
+    if (!id) {
+      toast.error("User ID is missing");
+      return;
+    }
+  
     try {
       const { data } = await axios.put("/api/user/" + id, { name });
       toast.success(data.message);
       fetchUser();
-      setShowInput(false);
+      setShowInput(false); // Close the input after successful update
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(error.response?.data?.message || "Something went wrong");
     }
   }
-
+  
   useEffect(() => {
     fetchUser();
   }, []);

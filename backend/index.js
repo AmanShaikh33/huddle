@@ -1,4 +1,5 @@
 import express from "express";
+import cors from 'cors'
 import dotenv from "dotenv";
 import { connectDb } from "./database/db.js";
 import cloudinary from "cloudinary";
@@ -11,6 +12,7 @@ import path from "path";
 import axios from 'axios';
 
 const url = `http://localhost:7000`;
+// const frontendUrl = process.env.CORS_ORIGIN
 const interval = 30000;
 
 function reloadWebsite() {
@@ -44,6 +46,13 @@ cloudinary.v2.config({
 //using middlewares
 app.use(express.json());
 app.use(cookieParser());
+app.use(
+  cors({
+    origin: process.env.CORS_ORIGIN || "https://echo-an.netlify.app/",
+    credentials: true,
+    maxAge: 14400,
+  })
+);
 
 const port = process.env.PORT;
 

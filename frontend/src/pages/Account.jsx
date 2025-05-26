@@ -65,6 +65,8 @@ const Account = ({ user }) => {
   };
 
   useEffect(() => {
+    if (!user?._id) return;  // Prevent the API call if user._id is undefined
+  
     const followData = async () => {
       try {
         const { data } = await axios.get(`/api/user/followdata/${user._id}`);
@@ -74,6 +76,7 @@ const Account = ({ user }) => {
         console.error(error);
       }
     };
+  
     followData();
   }, [user]);
 

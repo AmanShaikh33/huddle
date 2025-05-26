@@ -34,6 +34,14 @@ export const newPost = TryCatch(async (req, res) => {
     type,
   });
 
+  const postsCount = await Post.countDocuments({ owner: ownerId });
+
+  // Step 4: If it's the first post, update the user's badge
+  if (postsCount === 1) {
+    await User.findByIdAndUpdate(ownerId, { 'badges.firstPost': true });
+  }
+
+
   res.status(201).json({
     message: "Post created",
     post,

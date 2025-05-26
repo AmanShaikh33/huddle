@@ -66,20 +66,22 @@ const UserAccount = ({ user: loggedInUser }) => {
   const [followersData, setFollowersData] = useState([]);
   const [followingsData, setFollowingsData] = useState([]);
 
-  async function followData() {
-    try {
-      const { data } = await axios.get("/api/user/followdata/" + user._id);
-      setFollowersData(data.followers);
-      setFollowingsData(data.followings);
-    } catch (error) {
-      console.log(error);
-    }
-  }
-
   useEffect(() => {
+    if (!user?._id) return; // Only call followData if user._id is defined
+  
+    const followData = async () => {
+      try {
+        const { data } = await axios.get(`/api/user/followdata/${user._id}`);
+        setFollowersData(data.followers);
+        setFollowingsData(data.followings);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+  
     followData();
-  }, [user]);
-
+  }, [user]);  // Run when `user` changes
+  
   const { onlineUsers } = SocketData();
 
   return (
@@ -153,6 +155,26 @@ const UserAccount = ({ user: loggedInUser }) => {
                   )}
                 </div>
               </div>
+
+             {user?.badges && Object.keys(user.badges).length > 0 && (
+  <div className="w-full max-w-md bg-gray-800 rounded-md p-4 text-white">
+    <h2 className="text-lg font-semibold mb-3">Badges</h2>
+    <div className="flex flex-wrap gap-3">
+      {user.badges.oneFollower && (
+        <span className="px-3 py-1 bg-yellow-500 text-black rounded-full text-sm font-medium">
+          🥇 1 Follower Badge
+        </span>
+      )}
+      {user.badges.fiveFollowers && (
+        <span className="px-3 py-1 bg-green-500 text-white rounded-full text-sm font-medium">
+          🥉 5 Followers Badge
+        </span>
+      )}
+    </div>
+  </div>
+)}
+
+             
 
               <div className="controls flex justify-center items-center bg-gray-800 p-4 rounded-md gap-7">
                 <button

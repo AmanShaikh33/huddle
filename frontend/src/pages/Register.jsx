@@ -56,7 +56,7 @@ const Register = () => {
               </div>
 
               <form onSubmit={submitHandler}>
-                <div className="flex flex-col justify-center items-center m-2 space-y-4 md:space-y-8">
+                <div className="flex flex-col justify-center items-center m-2 space-y-4 md:space-y-4">
                   {filePrev && (
                     <img
                       src={filePrev}

@@ -25,41 +25,66 @@ export const followandUnfollowUser = TryCatch(async (req, res) => {
   const user = await User.findById(req.params.id);
   const loggedInUser = await User.findById(req.user._id);
 
-  if (!user)
-    return res.status(404).json({
-      message: "No User with is id",
-    });
+  if (!user) {
+    return res.status(404).json({ message: "No user with this ID" });
+  }
 
-  if (user._id.toString() === loggedInUser._id.toString())
-    return res.status(400).json({
-      message: "You can't follow yourself",
-    });
+  if (user._id.toString() === loggedInUser._id.toString()) {
+    return res.status(400).json({ message: "You can't follow yourself" });
+  }
 
   if (user.followers.includes(loggedInUser._id)) {
-    const indexFollowing = loggedInUser.followings.indexOf(user._id);
-    const indexFollower = user.followers.indexOf(loggedInUser._id);
+    // Unfollow
+    user.followers = user.followers.filter(
+      (followerId) => followerId.toString() !== loggedInUser._id.toString()
+    );
+    loggedInUser.followings = loggedInUser.followings.filter(
+      (followingId) => followingId.toString() !== user._id.toString()
+    );
 
-    loggedInUser.followings.splice(indexFollowing, 1);
-    user.followers.splice(indexFollower, 1);
-
-    await loggedInUser.save();
     await user.save();
+    await loggedInUser.save();
 
-    res.json({
-      message: "User Unfollowed",
-    });
+    return res.json({ message: "User unfollowed" });
   } else {
-    loggedInUser.followings.push(user._id);
+    // Follow
     user.followers.push(loggedInUser._id);
+    loggedInUser.followings.push(user._id);
 
-    await loggedInUser.save();
-    await user.save();
+    await loggedInUser.save(); // Save loggedInUser first
 
-    res.json({
-      message: "User Followed",
+    // Badge Logic
+    let badgeUnlocked = false;
+
+    if (
+      user.followers.length === 1 &&
+      !user.badges.oneFollower // Change this key if your schema uses a different name
+    ) {
+      user.badges.oneFollower = true;
+      badgeUnlocked = true;
+    }
+
+    if (
+      user.followers.length === 5 &&
+      !user.badges.fiveFollowers
+    ) {
+      user.badges.fiveFollowers = true;
+      badgeUnlocked = true;
+    }
+
+    await user.save(); // Save user after updating badges and followers
+
+    return res.json({
+      message: badgeUnlocked
+        ? "User followed. Badge unlocked!"
+        : "User followed",
+      badges: user.badges,
     });
   }
 });
+
+
+
 
 export const userFollowerandFollowingData = TryCatch(async (req, res) => {
   const user = await User.findById(req.params.id)
@@ -73,6 +98,7 @@ export const userFollowerandFollowingData = TryCatch(async (req, res) => {
   res.json({
     followers,
     followings,
+    badges: user.badges,
   });
 });
 

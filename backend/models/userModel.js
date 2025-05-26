@@ -36,6 +36,15 @@ const userSchema = new mongoose.Schema(
       id: String,
       url: String,
     },
+
+    // 👇 New Badges Field Added
+   badges: {
+  firstPost: { type: Boolean, default: false },
+  oneFollower: { type: Boolean, default: false },    // Add this
+  fiveFollowers: { type: Boolean, default: false },
+  chatter: { type: Boolean, default: false },
+}
+
   },
   {
     timestamps: true,
