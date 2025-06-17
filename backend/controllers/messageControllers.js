@@ -50,7 +50,7 @@ export const sendMessage = TryCatch(async (req, res) => {
     io.to(reciverSocketId).emit("newMessage", newMessage);
   }
 
-  res.status(201).json(newMessage);
+  res.status(201).json(newMessage);4
 });
 
 export const getAllMessages = TryCatch(async (req, res) => {
